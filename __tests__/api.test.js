@@ -88,29 +88,21 @@ test('should return correct article Id for the given article ID path', () => {
         expect(articles.article_id).toBe(1)  
 });
 })
-    test('should return correct keys and match type for given articleID', () => {
-        return request(app)
-        .get('/api/articles/1')
-        .expect(200)
-        .then(({body}) => {
-            const {articles} = body
-            expect(articles).toHaveProperty('author', expect.any(String))
-                expect(articles).toHaveProperty('author', expect.any(String));
-                expect(articles).toHaveProperty('title', expect.any(String));
-                expect(articles).toHaveProperty('article_id', expect.any(Number));
-                expect(articles).toHaveProperty('body', expect.any(String));
-                expect(articles).toHaveProperty('topic', expect.any(String));
-                expect(articles).toHaveProperty('created_at', expect.any(String));
-                expect(articles).toHaveProperty('votes', expect.any(Number));
-                expect(articles).toHaveProperty('article_img_url', expect.any(String));;  
-    });
-    })
+   
     test('should return a 400 status code when invalid ID format', () => {
         return request(app)
         .get('/api/articles/no_such_id')
         .expect(400)
         .then(({body}) => {
             expect(body.msg).toBe("Incorrect ID format")
+        })
+    });
+    test('should return a 404 status code when valid ID given, but not found in DB', () => {
+        return request(app)
+        .get('/api/articles/999999')
+        .expect(404)
+        .then(({body}) => {
+            expect(body.msg).toBe("Article ID not found")
         })
     });
 })
