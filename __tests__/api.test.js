@@ -43,23 +43,17 @@ describe("GET / API / TOPICS", () => {
             expect(topics).toBeInstanceOf(Array)
         })
     })
-    test('it should return objects with the keys slug and description', () =>{
-        return request(app)
-        .get('/api/topics')
-        .expect(200)
-        .then(({body}) => {
-            const {topics} = body
-            expect(Object.keys(topics[0])).toEqual(["slug", "description"])
-    })
-})
-test('it should return the keys slug and description for each item in the array', () =>{
+
+test('it should return correct keys, match type and ', () =>{
     return request(app)
     .get('/api/topics')
     .expect(200)
     .then(({body}) => {
         const {topics} = body
-        topics.forEach((topic) => {
-            expect(Object.keys(topic)).toEqual(["slug", "description"]);
+        expect(topics).toHaveLength(3)   
+        topics.forEach((topics) => {
+            expect(topics).toHaveProperty('slug', expect.any(String));
+            expect(topics).toHaveProperty('description', expect.any(String));
 })
 })
 })
