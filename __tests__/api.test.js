@@ -2,7 +2,8 @@ const request = require("supertest")
 const app = require("../app");
 const db = require ('../db/connection')
 const seed = require('../db/seeds/seed')
-const testData = require('../db/data/test-data')
+const testData = require('../db/data/test-data');
+// const { describe } = require("node:test");
 
 beforeEach(() => {
     return seed(testData)
@@ -77,7 +78,6 @@ describe('4. GET /api/articles/:article_id', () => {
         expect(articles).toEqual(articleOne)  
 });
 })
-   
     test('should return a 400 status code when invalid ID format', () => {
         return request(app)
         .get('/api/articles/no_such_id')
@@ -94,4 +94,56 @@ describe('4. GET /api/articles/:article_id', () => {
             expect(body.msg).toBe("Article ID not found")
         })
     });
+})
+
+describe("5. GET /api/articles", () => {
+    test('it should return an array with correct object keys and match types', () => {
+        return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then(({body}) => {
+            const {articles} = body
+            expect(articles).toBeInstanceOf(Array)
+            expect(articles).toHaveLength(12)  
+            articles.forEach((articles) => {
+                expect(articles).toHaveProperty('author', expect.any(String));
+                expect(articles).toHaveProperty('title', expect.any(String));
+                expect(articles).toHaveProperty('article_id', expect.any(Number));
+                expect(articles).toHaveProperty('topic', expect.any(String));
+                expect(articles).toHaveProperty('created_at', expect.any(String));
+                expect(articles).toHaveProperty('votes', expect.any(Number));
+                expect(articles).toHaveProperty('article_img_url', expect.any(String));
+                expect(articles).toHaveProperty('comment_count', expect.any(Number));
+            })
+    }) 
+})
+    test('should return single article with all relevant properties including comment count', () => {
+        return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then(({body}) => {
+            const {articles} = body
+            const articleOne = {"article_id": 1, 
+            "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700", 
+            "author": "butter_bridge", 
+            "created_at": "2020-07-09T20:11:00.000Z", 
+            "title": "Living in the shadow of a great man", 
+            "topic": "mitch", 
+            "votes": 100,
+            "comment_count": 11}
+            const articleDB = articles.find((articleOne) => articleOne.article_id === 1);
+            expect(articleDB).toEqual(articleOne)
+    })
+})
+    test("should return articles in descending order of date created", () => {
+        return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then(({body}) => {
+            const {articles} = body
+        const orderedArticles = [...articles]
+        orderedArticles.sort((a, b) => a.created_at - b.created_at);
+        expect(orderedArticles).toEqual(articles)
+})
+})
 })
