@@ -13,7 +13,7 @@ afterAll(() => {
 });
 
 describe("error codes", () => {
-      test('Responds with a 200 that the server is responding', () => {
+ test('Responds with a 200 that the server is responding', () => {
         return request(app)
             .get("/api")
             .expect(200)
@@ -34,7 +34,7 @@ describe("error codes", () => {
 })
 
 describe("GET / API / TOPICS", () => {
-    test('it should return an array', () => {
+  test('it should return an array', () => {
         return request(app)
         .get('/api/topics')
         .expect(200)

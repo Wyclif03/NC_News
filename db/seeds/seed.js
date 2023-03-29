@@ -62,6 +62,7 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
       const insertTopicsQueryStr = format(
         'INSERT INTO topics (slug, description) VALUES %L;',
         topicData.map(({ slug, description }) => [slug, description])
+        
       );
       const topicsPromise = db.query(insertTopicsQueryStr);
 
