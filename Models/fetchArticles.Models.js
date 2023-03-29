@@ -8,5 +8,10 @@ exports.fetchArticles = () => {
 
 exports.fetchArticlesById = (article_id) => {
     return db.query("SELECT * FROM articles WHERE article_id = $1", [article_id])
-        .then((result) => result.rows[0]);
+        .then((result) => {
+            if(!result.rows[0]){
+                return Promise.reject({msg: 'Article ID not found', status: 404})
+        }
+        return result.rows[0]
+    }) 
 }

@@ -1,5 +1,5 @@
 const request = require("supertest")
-const app = require("../db/app");
+const app = require("../app");
 const db = require ('../db/connection')
 const seed = require('../db/seeds/seed')
 const testData = require('../db/data/test-data')
@@ -60,32 +60,21 @@ test('it should return correct keys, match type and length ', () =>{
 })
 
 describe('4. GET /api/articles/:article_id', () => {
-    test('it should return correct keys, match type for all objects in array ', () => {
-        return request(app)
-        .get('/api/articles')
-        .expect(200)
-        .then(({body}) => {
-            const {articles} = body
-            articles.forEach((articles) => {
-                expect(articles).toHaveProperty('author', expect.any(String));
-                expect(articles).toHaveProperty('title', expect.any(String));
-                expect(articles).toHaveProperty('article_id', expect.any(Number));
-                expect(articles).toHaveProperty('body', expect.any(String));
-                expect(articles).toHaveProperty('topic', expect.any(String));
-                expect(articles).toHaveProperty('created_at', expect.any(String));
-                expect(articles).toHaveProperty('votes', expect.any(Number));
-                expect(articles).toHaveProperty('article_img_url', expect.any(String));
-            })
-    }) 
-});
-
-test('should return correct article Id for the given article ID path', () => {
+    test('should return correct article Id and values for the given article ID path.', () => {
     return request(app)
     .get('/api/articles/1')
     .expect(200)
     .then(({body}) => {
+        const articleOne = {"article_id": 1, 
+            "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700", 
+            "author": "butter_bridge", 
+            "body": "I find this existence challenging", 
+            "created_at": "2020-07-09T20:11:00.000Z", 
+            "title": "Living in the shadow of a great man", 
+            "topic": "mitch", 
+            "votes": 100}
         const {articles} = body
-        expect(articles.article_id).toBe(1)  
+        expect(articles).toEqual(articleOne)  
 });
 })
    

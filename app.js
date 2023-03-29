@@ -1,9 +1,15 @@
 const express = require("express");
 const app = express();
-app.use(express.json());
+const {
+    PSQLerrors,
+    customErrors,
+    status500
+        } = require ('./Controllers/errorHandling.controller.js')
+const getTopics = require('./Controllers/Topics.controller.js')
+const { 
+    getArticles, 
+    getArticleById }  = require('./Controllers/Articles.controller.js');
 
-const getTopics = require('../Controllers/Topics.controller.js')
-const { getArticles, getArticleById }  = require('../Controllers/Articles.controller.js')
 
 app.get('/api/topics', getTopics)
 app.get('/api/articles', getArticles)
@@ -16,12 +22,10 @@ app.use('/*', (req, res) => {
     res.status(404).send({message:'Path does not exist'})
 })
 
-app.use(PSQLerrors = (err, req, res, next) => {
-    if (err.code === '22P02') {
-        res.status(400).send({msg: 'Incorrect ID format'})
-    } else {
-        next(err);
-    }
-})
+app.use(PSQLerrors)
+app.use(customErrors)
+app.use(status500) 
+
+
 
 module.exports = app
