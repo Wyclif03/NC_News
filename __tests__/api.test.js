@@ -3,7 +3,8 @@ const app = require("../app");
 const db = require ('../db/connection')
 const seed = require('../db/seeds/seed')
 const testData = require('../db/data/test-data');
-// const { describe } = require("node:test");
+
+
 
 beforeEach(() => {
     return seed(testData)
@@ -138,6 +139,31 @@ describe("5. GET /api/articles", () => {
     test("should return articles in descending order of date created", () => {
         return request(app)
         .get('/api/articles')
+        .expect(200)
+        .then(({body}) => {
+            const {articles} = body
+        const orderedArticles = [...articles]
+        orderedArticles.sort((a, b) => a.created_at - b.created_at);
+        expect(orderedArticles).toEqual(articles)
+})
+})
+})
+
+describe('6. GET /api/articles/:article_id/comments', () => {
+    test('should return the required outputs for a single hard coded example AND return 11 expected comments', () => {
+        return request(app)
+        .get('/api/articles/1/comments')
+        .expect(200)
+        .then(({body}) => {
+            const articleOne = {"article_id": 1, "author": "butter_bridge", "body": "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.", "comment_id": 2, "created_at": "2020-10-31T03:03:00.000Z", "votes": 14}
+            const {articles} = body
+            expect(articles.length).toBe(11)
+            expect(articles[0]).toEqual(articleOne)  
+    });
+});
+    test("should return most recent comments first", () => {
+        return request(app)
+        .get('/api/articles/1/comments')
         .expect(200)
         .then(({body}) => {
             const {articles} = body

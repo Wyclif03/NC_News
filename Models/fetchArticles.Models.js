@@ -22,3 +22,20 @@ exports.fetchArticlesById = (article_id) => {
         return result.rows[0]
     }) 
 }
+
+exports.fetchArticleByIdAndComments = (article_id) => {
+    return db.query("SELECT comment_id, votes, created_at, author, body, article_id FROM comments WHERE article_id = $1", [article_id])
+        .then((result) => {
+            if(!result.rows[0]){
+                return Promise.reject({msg: 'Article ID not found', status: 404})
+        }
+        return result.rows.map((comment) => ({
+            comment_id: comment.comment_id,
+            votes: comment.votes,
+            created_at: comment.created_at,
+            author: comment.author,
+            body: comment.body,
+            article_id: comment.article_id
+        }));
+    }) 
+}
