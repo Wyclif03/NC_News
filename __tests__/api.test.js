@@ -1,17 +1,16 @@
+
 const request = require("supertest")
 const app = require("../app");
 const db = require ('../db/connection')
 const seed = require('../db/seeds/seed')
-const testData = require('../db/data/test-data')
+const testData = require('../db/data/test-data');
 
 beforeEach(() => {
     return seed(testData)
 })
-
 afterAll(() => {
     return db.end();
 });
-
 describe("error codes", () => {
  test('Responds with a 200 that the server is responding', () => {
         return request(app)
@@ -32,7 +31,6 @@ describe("error codes", () => {
         })
     })
 })
-
 describe("GET / API / TOPICS", () => {
   test('it should return an array', () => {
         return request(app)
@@ -43,7 +41,6 @@ describe("GET / API / TOPICS", () => {
             expect(topics).toBeInstanceOf(Array)
         })
     })
-
 test('it should return correct keys, match type and length ', () =>{
     return request(app)
     .get('/api/topics')
@@ -58,7 +55,6 @@ test('it should return correct keys, match type and length ', () =>{
 })
 })
 })
-
 describe('4. GET /api/articles/:article_id', () => {
     test('should return correct article Id and values for the given article ID path.', () => {
     return request(app)
@@ -77,7 +73,6 @@ describe('4. GET /api/articles/:article_id', () => {
         expect(articles).toEqual(articleOne)  
 });
 })
-   
     test('should return a 400 status code when invalid ID format', () => {
         return request(app)
         .get('/api/articles/no_such_id')
@@ -95,3 +90,131 @@ describe('4. GET /api/articles/:article_id', () => {
         })
     });
 })
+describe("5. GET /api/articles", () => {
+    test('it should return an array with correct object keys and match types', () => {
+        return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then(({body}) => {
+            const {articles} = body
+            expect(articles).toBeInstanceOf(Array)
+            expect(articles).toHaveLength(12)  
+            articles.forEach((articles) => {
+                expect(articles).toHaveProperty('author', expect.any(String));
+                expect(articles).toHaveProperty('title', expect.any(String));
+                expect(articles).toHaveProperty('article_id', expect.any(Number));
+                expect(articles).toHaveProperty('topic', expect.any(String));
+                expect(articles).toHaveProperty('created_at', expect.any(String));
+                expect(articles).toHaveProperty('votes', expect.any(Number));
+                expect(articles).toHaveProperty('article_img_url', expect.any(String));
+                expect(articles).toHaveProperty('comment_count', expect.any(Number));
+            })
+    }) 
+})
+    test('should return single article with all relevant properties including comment count', () => {
+        return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then(({body}) => {
+            const {articles} = body
+            const articleOne = {"article_id": 1, 
+            "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700", 
+            "author": "butter_bridge", 
+            "created_at": "2020-07-09T20:11:00.000Z", 
+            "title": "Living in the shadow of a great man", 
+            "topic": "mitch", 
+            "votes": 100,
+            "comment_count": 11}
+            const articleDB = articles.find((articleOne) => articleOne.article_id === 1);
+            expect(articleDB).toEqual(articleOne)
+    })
+})
+    test("should return articles in descending order of date created", () => {
+        return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then(({body}) => {
+            const {articles} = body
+        const orderedArticles = [...articles]
+        orderedArticles.sort((a, b) => a.created_at - b.created_at);
+        expect(orderedArticles).toEqual(articles)
+})
+})
+})
+describe('6. GET /api/articles/:article_id/comments', () => {
+    test('should return the required outputs for a single hard coded example AND return 11 expected comments', () => {
+        return request(app)
+        .get('/api/articles/1/comments')
+        .expect(200)
+        .then(({body}) => {
+            const articleOne = {"article_id": 1, "author": "butter_bridge", "body": "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.", "comment_id": 2, "created_at": "2020-10-31T03:03:00.000Z", "votes": 14}
+            const {articles} = body
+            expect(articles.length).toBe(11)
+            expect(articles[0]).toEqual(articleOne)  
+    });
+});
+    test("should return most recent comments first", () => {
+        return request(app)
+        .get('/api/articles/1/comments')
+        .expect(200)
+        .then(({body}) => {
+            const {articles} = body
+        const orderedArticles = [...articles]
+        orderedArticles.sort((a, b) => a.created_at - b.created_at);
+        expect(orderedArticles).toEqual(articles)
+})
+})
+    test('should return undefined when valid articleID but no comments found ', () => {
+    return request(app)
+    .get('/api/articles/4/comments')
+    .expect(200)
+    .then(({body}) => {
+        const {articles} = body
+        expect(articles[0]).toEqual(undefined)  
+    });
+})
+})
+describe('7. POST /api/articles/:article_id/comments', () => {
+    test('should return the comment (all other requestObjects are ignored) and ensure post is made with 2 new objects', () => {
+        return request(app)
+            .post('/api/articles/1/comments')
+            .send({
+                username: "butter_bridge", 
+                body: "sent a new comment"
+            })
+                .expect(201)
+            .then(({ body }) => {
+                expect(body).toEqual({comment:"sent a new comment"})
+            
+            return request(app)
+            .get('/api/articles/1/comments')
+            .expect(200)
+            .then(({body}) => {
+                const {articles} = body
+                expect(articles[11].body).toEqual('sent a new comment')
+                expect(articles[11].author).toEqual('butter_bridge')
+            })
+    })
+})
+
+test('should return 404 if the article does not exist', () => {
+    return request(app)
+        .post('/api/articles/9999/comments')
+        .send({
+            username: "dan the man", 
+            body: "sent a new comment"
+        })
+            .expect(404)
+        })
+    test('should return a 400 when id is not correct format', () => {
+        return request(app)
+            .post('/api/articles/abc/comments')
+            .send({
+                username: "dan the man", 
+                body: "sent a new comment"
+            })
+                .expect(400)
+            })
+    })
+
+        

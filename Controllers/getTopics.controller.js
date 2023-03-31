@@ -1,4 +1,4 @@
-const app = require("../db/app");
+const app = require("../app");
 const fetchTopics = require('../Models/fetchTopics.Models.js')
 
 const getTopics = (req, res, next) => {
