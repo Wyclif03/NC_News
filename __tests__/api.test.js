@@ -4,6 +4,7 @@ const db = require ('../db/connection')
 const seed = require('../db/seeds/seed')
 const testData = require('../db/data/test-data');
 
+
 beforeEach(() => {
     return seed(testData)
 })
@@ -170,7 +171,15 @@ describe('6. GET /api/articles/:article_id/comments', () => {
         expect(orderedArticles).toEqual(articles)
 })
 })
-
+    test('should return undefined when valid articleID but no comments found ', () => {
+    return request(app)
+    .get('/api/articles/4/comments')
+    .expect(200)
+    .then(({body}) => {
+        const {articles} = body
+        expect(articles[0]).toEqual(undefined)  
+    });
+})
 })
 
 describe('7. POST /api/articles/:article_id/comments', () => {
@@ -196,4 +205,20 @@ describe('7. POST /api/articles/:article_id/comments', () => {
             })
     })
 })
-})
+// test.only('should return 404 if the article does not exist', () => {
+//     return request(app)
+//         .post('/api/articles/9999/comments')
+//             .expect(404)
+//         })
+//     test('should return a 400 when id is not correct format', () => {
+//         return request(app)
+//             .post('/api/articles/abc/comments')
+//                 .expect(400)
+//             })
+//     test('should return a 404 when username does not exist', () => {
+//         return request(app)
+//             .post('/api/articles/abc/comments')
+//                 .expect(404)
+//             })
+    })
+

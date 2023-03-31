@@ -26,24 +26,30 @@ exports.getArticleById = (req, res, next) => {
 
 exports.getArticleByIdAndComments = (req, res, next) => {
     const { article_id } = req.params;
-    fetchArticleByIdAndComments(article_id)
-        .then((articles) => {
+    if (fetchArticlesById(article_id))
+     {
+        fetchArticleByIdAndComments(article_id)
+            .then((articles) => {
                 res.status(200).send({articles})
-        })
-        .catch((err) => {
-            next(err)
-        })
+                
+            })
+            .catch((err) => {
+                next(err)
+            })
+    }
 }
 
 exports.postCommentsbyArticle = (req, res, next) => {
-    const { username, body} = req.body;
+    const { username, body } = req.body;
     const { article_id } = req.params;
 
-    postModelCommentsbyArticle(username, body, article_id)
-        .then((comment) => {
-            res.status(201).send({ comment });
-        })
-        .catch((err) => {
-            next(err);
-        });
+    if (fetchArticlesById(article_id)) {
+        postModelCommentsbyArticle(username, body, article_id)
+            .then((comment) => {
+                res.status(201).send({ comment });
+            })
+            .catch((err) => {
+                next(err);
+            });
+    }
 };
