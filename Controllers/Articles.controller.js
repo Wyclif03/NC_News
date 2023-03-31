@@ -1,13 +1,13 @@
 const app = require("../app");
 const { fetchArticles, 
     fetchArticlesById,
-    fetchArticleByIdAndComments 
+    fetchArticleByIdAndComments,
 } = require('../Models/fetchArticles.Models.js')
+
 
 exports.getArticles = (req, res, next) => {
     fetchArticles().then((articles) => res.status(200).send({articles}))
 }
-
 exports.getArticleById = (req, res, next) => {
     const { article_id } = req.params;
     fetchArticlesById(article_id)
@@ -21,13 +21,15 @@ exports.getArticleById = (req, res, next) => {
 
 exports.getArticleByIdAndComments = (req, res, next) => {
     const { article_id } = req.params;
-    fetchArticleByIdAndComments(article_id)
-        .then((articles) => {
+    if (fetchArticlesById(article_id))
+     {
+        fetchArticleByIdAndComments(article_id)
+            .then((articles) => {
                 res.status(200).send({articles})
-        })
-        .catch((err) => {
-            next(err)
-        })
+                
+            })
+            .catch((err) => {
+                next(err)
+            })
+    }
 }
-
-

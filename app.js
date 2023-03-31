@@ -1,3 +1,4 @@
+
 const express = require("express");
 const app = express();
 const {
@@ -9,9 +10,9 @@ const getTopics = require('./Controllers/Topics.controller.js')
 const { 
     getArticles, 
     getArticleById,
-    getArticleByIdAndComments }  = require('./Controllers/Articles.controller.js');
-
-
+    getArticleByIdAndComments,
+     }  = require('./Controllers/Articles.controller.js');
+app.use(express.json())
 app.get('/api/topics', getTopics)
 app.get('/api/articles', getArticles)
 app.get('/api/articles/:article_id', getArticleById);
@@ -27,7 +28,6 @@ app.use('/*', (req, res) => {
 app.use(PSQLerrors)
 app.use(customErrors)
 app.use(status500) 
-
 
 
 module.exports = app

@@ -161,7 +161,7 @@ describe('6. GET /api/articles/:article_id/comments', () => {
             expect(articles[0]).toEqual(articleOne)  
     });
 });
-    test("should return most recengitt comments first", () => {
+    test("should return most recent comments first", () => {
         return request(app)
         .get('/api/articles/1/comments')
         .expect(200)
@@ -171,5 +171,14 @@ describe('6. GET /api/articles/:article_id/comments', () => {
         orderedArticles.sort((a, b) => a.created_at - b.created_at);
         expect(orderedArticles).toEqual(articles)
 })
+})
+test('should return undefined when valid articleID but no comments found ', () => {
+    return request(app)
+    .get('/api/articles/4/comments')
+    .expect(200)
+    .then(({body}) => {
+        const {articles} = body
+        expect(articles[0]).toEqual(undefined)  
+    });
 })
 })
