@@ -161,7 +161,7 @@ describe('6. GET /api/articles/:article_id/comments', () => {
             expect(articles[0]).toEqual(articleOne)  
     });
 });
-    test("should return most recent comments first", () => {
+    test("should return most recengitt comments first", () => {
         return request(app)
         .get('/api/articles/1/comments')
         .expect(200)
