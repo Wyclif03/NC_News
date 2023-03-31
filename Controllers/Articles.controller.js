@@ -41,7 +41,6 @@ exports.postCommentsbyArticle = (req, res, next) => {
 
     postModelCommentsbyArticle(username, body, article_id)
         .then((comment) => {
-            console.log(comment, "inside controller")
             res.status(201).send({ comment });
         })
         .catch((err) => {
