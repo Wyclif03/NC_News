@@ -4,8 +4,6 @@ const db = require ('../db/connection')
 const seed = require('../db/seeds/seed')
 const testData = require('../db/data/test-data');
 
-
-
 beforeEach(() => {
     return seed(testData)
 })
@@ -171,5 +169,31 @@ describe('6. GET /api/articles/:article_id/comments', () => {
         orderedArticles.sort((a, b) => a.created_at - b.created_at);
         expect(orderedArticles).toEqual(articles)
 })
+})
+
+})
+
+describe('7. POST /api/articles/:article_id/comments', () => {
+    test('should return the comment and ensure post is made with 2 new objects', () => {
+        return request(app)
+            .post('/api/articles/1/comments')
+            .send({
+                username: "butter_bridge", 
+                body: "sent a new comment"
+            })
+                .expect(201)
+            .then(({ body }) => {
+                expect(body.comment).toBe("sent a new comment");
+            
+            return request(app)
+            .get('/api/articles/1/comments')
+            .expect(200)
+            .then(({body}) => {
+                const {articles} = body
+                expect(articles[11].body).toEqual('sent a new comment')
+                expect(articles[11].author).toEqual('butter_bridge')
+
+            })
+    })
 })
 })

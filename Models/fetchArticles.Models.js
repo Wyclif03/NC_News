@@ -29,13 +29,9 @@ exports.fetchArticleByIdAndComments = (article_id) => {
             if(!result.rows[0]){
                 return Promise.reject({msg: 'Article ID not found', status: 404})
         }
-        return result.rows.map((comment) => ({
-            comment_id: comment.comment_id,
-            votes: comment.votes,
-            created_at: comment.created_at,
-            author: comment.author,
-            body: comment.body,
-            article_id: comment.article_id
-        }));
+        return result.rows
     }) 
 }
+
+
+
