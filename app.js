@@ -1,3 +1,4 @@
+
 const express = require("express");
 const app = express();
 const {
@@ -10,7 +11,8 @@ const {
     getArticles, 
     getArticleById,
     getArticleByIdAndComments,
-    postCommentsbyArticle }  = require('./Controllers/Articles.controller.js');
+    postCommentsbyArticle,
+    patchArticlesVote }  = require('./Controllers/Articles.controller.js');
 
 app.use(express.json())
 app.get('/api/topics', getTopics)
@@ -20,18 +22,15 @@ app.get('/api/articles/:article_id/comments', getArticleByIdAndComments)
 app.get("/api", (req, res) => {
     res.status(200).send({ message: "Server is working" })
 })
-
 app.post('/api/articles/:article_id/comments', postCommentsbyArticle )
-
 
 app.use('/*', (req, res) => {
     res.status(404).send({message:'Path does not exist'})
 })
-
+app.patch('/api/articles/:article_id', patchArticlesVote)
 app.use(PSQLerrors)
 app.use(customErrors)
 app.use(status500) 
-
 
 
 module.exports = app

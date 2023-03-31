@@ -1,5 +1,5 @@
-const db = require ('../db/connection')
 
+const db = require ('../db/connection')
 exports.fetchArticles = () => {
     return db.query(`
     SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, 
@@ -12,7 +12,6 @@ exports.fetchArticles = () => {
     return result.rows;
     });
 }
-
 exports.fetchArticlesById = (article_id) => {
     return db.query("SELECT * FROM articles WHERE article_id = $1", [article_id])
         .then((result) => {
@@ -22,13 +21,22 @@ exports.fetchArticlesById = (article_id) => {
         return result.rows[0]
     }) 
 }
-
 exports.fetchArticleByIdAndComments = (article_id) => {
     return db.query("SELECT comment_id, votes, created_at, author, body, article_id FROM comments WHERE article_id = $1", [article_id])
         .then((result) => {
         return result.rows
     }) 
 }
-
-
-
+exports.fetchUserName = (username) => {
+    return db.query("SELECT * FROM users WHERE username = $1", [username])
+      .then((result) => {
+        if (!result.rows[0]) {
+          return Promise.reject({msg: 'Username not found', status: 404})
+        }
+        return result.rows[0];
+      })
+      .catch((err) => {
+        console.error(err);
+        throw err;
+      });
+  }

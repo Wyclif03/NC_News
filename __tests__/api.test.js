@@ -1,18 +1,16 @@
+
 const request = require("supertest")
 const app = require("../app");
 const db = require ('../db/connection')
 const seed = require('../db/seeds/seed')
 const testData = require('../db/data/test-data');
 
-
 beforeEach(() => {
     return seed(testData)
 })
-
 afterAll(() => {
     return db.end();
 });
-
 describe("error codes", () => {
  test('Responds with a 200 that the server is responding', () => {
         return request(app)
@@ -33,7 +31,6 @@ describe("error codes", () => {
         })
     })
 })
-
 describe("GET / API / TOPICS", () => {
   test('it should return an array', () => {
         return request(app)
@@ -44,7 +41,6 @@ describe("GET / API / TOPICS", () => {
             expect(topics).toBeInstanceOf(Array)
         })
     })
-
 test('it should return correct keys, match type and length ', () =>{
     return request(app)
     .get('/api/topics')
@@ -59,7 +55,6 @@ test('it should return correct keys, match type and length ', () =>{
 })
 })
 })
-
 describe('4. GET /api/articles/:article_id', () => {
     test('should return correct article Id and values for the given article ID path.', () => {
     return request(app)
@@ -95,7 +90,6 @@ describe('4. GET /api/articles/:article_id', () => {
         })
     });
 })
-
 describe("5. GET /api/articles", () => {
     test('it should return an array with correct object keys and match types', () => {
         return request(app)
@@ -147,7 +141,6 @@ describe("5. GET /api/articles", () => {
 })
 })
 })
-
 describe('6. GET /api/articles/:article_id/comments', () => {
     test('should return the required outputs for a single hard coded example AND return 11 expected comments', () => {
         return request(app)
@@ -181,9 +174,8 @@ describe('6. GET /api/articles/:article_id/comments', () => {
     });
 })
 })
-
 describe('7. POST /api/articles/:article_id/comments', () => {
-    test('should return the comment and ensure post is made with 2 new objects', () => {
+    test('should return the comment (all other requestObjects are ignored) and ensure post is made with 2 new objects', () => {
         return request(app)
             .post('/api/articles/1/comments')
             .send({
@@ -192,7 +184,7 @@ describe('7. POST /api/articles/:article_id/comments', () => {
             })
                 .expect(201)
             .then(({ body }) => {
-                expect(body.comment).toBe("sent a new comment");
+                expect(body).toEqual({comment:"sent a new comment"})
             
             return request(app)
             .get('/api/articles/1/comments')
@@ -201,24 +193,28 @@ describe('7. POST /api/articles/:article_id/comments', () => {
                 const {articles} = body
                 expect(articles[11].body).toEqual('sent a new comment')
                 expect(articles[11].author).toEqual('butter_bridge')
-
             })
     })
 })
-// test.only('should return 404 if the article does not exist', () => {
-//     return request(app)
-//         .post('/api/articles/9999/comments')
-//             .expect(404)
-//         })
-//     test('should return a 400 when id is not correct format', () => {
-//         return request(app)
-//             .post('/api/articles/abc/comments')
-//                 .expect(400)
-//             })
-//     test('should return a 404 when username does not exist', () => {
-//         return request(app)
-//             .post('/api/articles/abc/comments')
-//                 .expect(404)
-//             })
+
+test('should return 404 if the article does not exist', () => {
+    return request(app)
+        .post('/api/articles/9999/comments')
+        .send({
+            username: "dan the man", 
+            body: "sent a new comment"
+        })
+            .expect(404)
+        })
+    test('should return a 400 when id is not correct format', () => {
+        return request(app)
+            .post('/api/articles/abc/comments')
+            .send({
+                username: "dan the man", 
+                body: "sent a new comment"
+            })
+                .expect(400)
+            })
     })
 
+        
